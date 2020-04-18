@@ -51,7 +51,7 @@ superset_config.py
 superset.egg-info/
 superset/bin/supersetc
 tmp
-
+testfile.txt
 # Node.js, webpack artifacts
 *.entry.js
 *.js.map
