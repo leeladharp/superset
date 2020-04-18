@@ -1,0 +1,65 @@
+--- superset31venv/lib/python3.6/site-packages/jaydebeapi/__init__.py	2019-10-09 15:05:37.539201259 +0000
++++ /tmp/__init__.py	2019-10-09 15:11:05.728208991 +0000
+@@ -157,6 +157,12 @@
+     
+ def _jdbc_connect_jpype(jclassname, url, driver_args, jars, libs):
+     import jpype
++
++    if jpype.isJVMStarted() and not jpype.isThreadAttachedToJVM():
++        jpype.attachThreadToJVM()
++        jpype.java.lang.Thread.currentThread().setContextClassLoader(jpype.java.lang.ClassLoader.getSystemClassLoader())
++
++
+     if not jpype.isJVMStarted():
+         args = []
+         class_path = []
+@@ -489,7 +495,7 @@
+             # print (i, parameters[i], type(parameters[i]))
+             prep_stmt.setObject(i + 1, parameters[i])
+ 
+-    def execute(self, operation, parameters=None):
++    def execute(self, operation, parameters=None, **kwargs):
+         if self._connection._closed:
+             raise Error()
+         if not parameters:
+@@ -499,14 +505,15 @@
+         self._set_stmt_parms(self._prep, parameters)
+         try:
+             is_rs = self._prep.execute()
++            if is_rs:
++               self._rs = self._prep.getResultSet()
++               self._meta = self._rs.getMetaData()
++               self.rowcount = -1
++            else:
++               self.rowcount = self._prep.getUpdateCount()
+         except:
+             _handle_sql_exception()
+-        if is_rs:
+-            self._rs = self._prep.getResultSet()
+-            self._meta = self._rs.getMetaData()
+             self.rowcount = -1
+-        else:
+-            self.rowcount = self._prep.getUpdateCount()
+         # self._prep.getWarnings() ???
+ 
+     def executemany(self, operation, seq_of_parameters):
+@@ -522,7 +529,8 @@
+ 
+     def fetchone(self):
+         if not self._rs:
+-            raise Error()
++#            raise Error()
++            return None
+         if not self._rs.next():
+             return None
+         row = []
+@@ -535,7 +543,8 @@
+ 
+     def fetchmany(self, size=None):
+         if not self._rs:
+-            raise Error()
++            #raise Error()
++            return None
+         if size is None:
+             size = self.arraysize
+         # TODO: handle SQLException if not supported by db
