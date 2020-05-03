@@ -86,7 +86,7 @@ RUN useradd -U -m superset && \
     tar xzf superset.tar.gz && \
     pip install dist/*.tar.gz -r requirements.txt -r keyvault-requirements.txt
 #    rm -rf ./*
-#Initialize superset database
+#Initialize superset database and install
 RUN superset db upgrade && \
     flask fab create-admin --username admin --firstname dvt --lastname admin --email admin.org --password admin && \
     superset init && \
