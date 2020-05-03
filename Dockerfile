@@ -15,8 +15,7 @@ COPY . ${SUPERSET_HOME}
 # Build assets and copy files
 WORKDIR ${SUPERSET_HOME}/superset/assets
 RUN npm install && \
-    npm run build && \
-    npm update
+    npm run build
 
 
 FROM python:${PYTHON_VERSION} AS dist
