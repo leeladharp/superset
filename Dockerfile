@@ -15,7 +15,8 @@ COPY . ${SUPERSET_HOME}
 # Build assets and copy files
 WORKDIR ${SUPERSET_HOME}/superset/assets
 RUN npm install && \
-    npm run build
+    npm run build && \
+    npm update
 
 
 FROM python:${PYTHON_VERSION} AS dist
@@ -36,7 +37,7 @@ FROM python:${PYTHON_VERSION} AS final
 ENV SUPERSET_HOME=/opt/superset
 
 # Configure environment
-ENV GUNICORN_BIND=0.0.0.0:9090 \
+ENV GUNICORN_BIND=0.0.0.0:2020 \
     GUNICORN_LIMIT_REQUEST_FIELD_SIZE=0 \
     GUNICORN_LIMIT_REQUEST_LINE=0 \
     GUNICORN_TIMEOUT=60 \
@@ -108,7 +109,7 @@ WORKDIR /home/superset
 #       /var/lib/superset
 
 # Finalize application
-EXPOSE 9090
-HEALTHCHECK CMD ["curl", "-f", "http://localhost:9090/health"]
+EXPOSE 2020
+HEALTHCHECK CMD ["curl", "-f", "http://localhost:2020/health"]
 CMD gunicorn superset:app
 #USER superset
